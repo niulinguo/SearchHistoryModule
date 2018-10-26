@@ -2,8 +2,10 @@ package com.niles.search_history;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -66,7 +68,9 @@ public class SearchHistoryActivity extends AppCompatActivity implements SearchHi
                     case EditorInfo.IME_ACTION_SEARCH: {
                         hideSoftInput();
                         String text = v.getText().toString();
-                        onSearch(text);
+                        if (!TextUtils.isEmpty(text)) {
+                            onSearch(text);
+                        }
                         return true;
                     }
                 }
@@ -131,7 +135,22 @@ public class SearchHistoryActivity extends AppCompatActivity implements SearchHi
     }
 
     public void onClearClicked(View view) {
-        mDatabase.searchHistoryDao().delete(mSearchDataList.toArray(new SearchHistoryEntity[0]));
+        new AlertDialog.Builder(this)
+                .setTitle("温馨提示")
+                .setMessage("清楚历史记录?")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mDatabase.searchHistoryDao().delete(mSearchDataList.toArray(new SearchHistoryEntity[0]));
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
     }
 
     private void hideSoftInput() {
